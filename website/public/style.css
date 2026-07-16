@@ -267,7 +267,7 @@ p:last-child { margin-bottom: 0; }
 }
 .stats-strip strong {
   font-family: var(--font-display);
-  font-weight: 800;
+  font-weight: 700;
   font-size: var(--fs-md);
   color: var(--phos);
   margin-right: 0.35rem;
@@ -309,7 +309,7 @@ p:last-child { margin-bottom: 0; }
   content: counter(pillar, decimal-leading-zero);
   position: absolute; left: 0; top: 1.6rem;
   font-family: var(--font-display);
-  font-weight: 800;
+  font-weight: 700;
   font-size: var(--fs-md);
   color: var(--phos-dim);
 }
@@ -337,7 +337,7 @@ p:last-child { margin-bottom: 0; }
   content: counter(kill);
   position: absolute; left: 0.3rem; top: var(--rhy-half);
   font-family: var(--font-display);
-  font-weight: 800;
+  font-weight: 700;
   font-size: var(--fs-base);
   color: var(--phos);
 }
@@ -359,7 +359,7 @@ p:last-child { margin-bottom: 0; }
   display: flex; align-items: center; gap: 0.75rem;
   width: 100%; box-sizing: border-box;
   padding: var(--rhy-half) 1rem;
-  font-family: var(--font-main); font-size: var(--fs-base); font-weight: 500;
+  font-family: var(--font-main); font-size: var(--fs-base); font-weight: 600;
   line-height: 1.5;
   color: var(--ink);
 }
