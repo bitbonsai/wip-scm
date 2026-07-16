@@ -194,7 +194,18 @@ p:last-child { margin-bottom: 0; }
   filter: drop-shadow(0 0 24px var(--phos-glow));
   pointer-events: none;
 }
-@media (max-width: 760px) { .hero-mark { display: none; } }
+/* mobile: mark becomes a faint background behind the headline */
+@media (max-width: 760px) {
+  .hero-top { position: relative; }
+  .hero-mark {
+    position: absolute;
+    top: -0.5rem; right: -2rem;
+    width: 230px; height: 230px;
+    opacity: 0.15;
+    filter: none;
+    z-index: -1;
+  }
+}
 
 .lede { font-size: var(--fs-md); line-height: 1.5; margin-bottom: 2.25rem; max-width: 62ch; }
 .lede strong { color: var(--phos); }
