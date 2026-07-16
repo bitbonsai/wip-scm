@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>wip — version control where commit doesn't mean publish to everyone</title>
+  <meta name="description" content="A design RFC for a post-git VCS with cryptographic read scopes. Sealed changes, path scopes, universal undo, lives inside your git repo. No code yet. Poke holes." />
+  <meta property="og:title" content="wip — an RFC for a post-git VCS" />
+  <meta property="og:description" content="Version control where commit doesn't mean publish to everyone. Design review wanted." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600&family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+  <script>document.documentElement.dataset.theme = localStorage.getItem('wip-theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');</script>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <meta property="og:image" content="https://wip-scm.org/og.png" />
+  <link rel="stylesheet" href="/style.css" />
+  <script defer src="/main.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3/dist/cdn.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <span class="logo">
+      <svg data-logo xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+        <g transform="translate(6.48 6.08) scale(0.46)" stroke-width="3.3">
+          <path d="M15 6a9 9 0 0 0-9 9V3"/>
+          <circle cx="18" cy="6" r="3"/>
+          <circle cx="6" cy="18" r="3"/>
+        </g>
+      </svg>
+      <span class="logo-text">wip<span class="dim">-scm</span></span>
+    </span>
+    <div class="header-actions">
+    <a class="rfc-badge" href="/rfc.html">RFC · NO CODE YET</a>
+    <a class="icon-btn" href="https://github.com/bitbonsai/wip-scm" aria-label="GitHub">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+    </a>
+    <button class="theme-toggle icon-btn" id="theme-toggle" aria-label="toggle dark/light mode">
+      <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+      <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+    </button>
+    </div>
+  </header>
+  <hr class="rule-glow" />
+
+  <main>
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+      <div class="hero-top">
+        <h1>version control where <em>commit</em> doesn't mean <em>publish to everyone</em></h1>
+        <svg class="hero-mark" data-logo xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+          <g transform="translate(6.48 6.08) scale(0.46)" stroke-width="2.5">
+            <path d="M15 6a9 9 0 0 0-9 9V3"/>
+            <circle cx="18" cy="6" r="3"/>
+            <circle cx="6" cy="18" r="3"/>
+          </g>
+        </svg>
+      </div>
+      <p class="lede">
+        wip is a proposed VCS built on <a href="https://github.com/jj-vcs/jj">jj</a>'s change model,
+        with cryptographic read scopes. Sealed changes, per-path access, universal undo,
+        and it lives inside your existing git repo. This page is a design RFC.
+        <strong>There is no code. We want you to poke holes before there is.</strong>
+      </p>
+
+      <div class="hero-cta">
+        <a class="btn" href="/rfc.html">Read the full RFC →</a>
+        <a class="btn btn-ghost" href="#cta">Get notified at binary</a>
+      </div>
+      <p class="hero-microcopy"><strong>Free forever.</strong> Apache-2.0. Built on jj. Exit guaranteed.</p>
+
+      <div class="terminal" id="hero-terminal" aria-label="terminal demo">
+        <div class="terminal-bar"><i></i><i></i><i></i><span>wip — demo (simulated)</span></div>
+        <pre id="terminal-body"><span class="cursor">_</span></pre>
+      </div>
+      <p class="terminal-note">Simulated output. That's the point of this page: it shouldn't stay simulated if the design survives review.</p>
+
+      <div class="stats-strip">
+        <span><strong>6</strong> design pillars</span>
+        <span><strong>9</strong> named kill risks</span>
+        <span><strong>2</strong> hostile reviews</span>
+        <span><strong>0</strong> lines of code</span>
+      </div>
+
+    </section>
+
+    <!-- ============ PROBLEM ============ -->
+    <section id="problem">
+      <h2><span class="sec-num">§1</span> the problem</h2>
+      <p class="big-claim">git has exactly one read permission: <strong>all</strong>.</p>
+      <p>Anything committed is readable by everyone with repo access, forever. Teams have normalized the consequences:</p>
+      <ul class="problem-list">
+        <li>Security fixes developed in out-of-band private forks, patch-over-email, ceremony outside the VCS.</li>
+        <li>Monorepos split not for size (tooling solved that) but for <strong>access control</strong>, paid for in dependency hell.</li>
+        <li>Secrets can't live in the repo, so every team bolts on a parallel universe: Vault, SOPS, sealed-secrets, .env files passed over Slack. Config drifts from the code that consumes it, and the drift causes outages.</li>
+        <li>On every forge, "private repo" means <em>the forge can read it</em>. Private as policy, not as structure.</li>
+      </ul>
+      <p>Separately: git's daily UX carries 20 years of accumulated fear. jj already proved a better model, working copy as a commit, no staging, no stash, undo for everything. Nobody has combined that model with cryptographic read scopes. That empty quadrant is the proposal.</p>
+    </section>
+
+    <!-- ============ DESIGN ============ -->
+    <section id="design">
+      <h2><span class="sec-num">§2</span> the design, six pillars</h2>
+      <ol class="pillars">
+        <li>
+          <h3>Sealed changes</h3>
+          <p><code>wip commit --seal sec-team</code>: content, message, and paths encrypted, the world sees an opaque blob. <code>wip reveal</code> publishes one key and the change goes public with the same hash. Embargoes become a native workflow.</p>
+        </li>
+        <li>
+          <h3>Standing path scopes</h3>
+          <p><code>/payments</code> readable only by payments-team. Your .env versioned in the repo, readable only by you. Replaces the SOPS/git-crypt/.env layer.</p>
+        </li>
+        <li>
+          <h3>jj's proven model</h3>
+          <p>Working copy is a commit. No staging, no stash. Conflicts never block. Universal undo.</p>
+        </li>
+        <li>
+          <h3>Lives inside git + coach mode</h3>
+          <p><code>wip init --coexist</code> joins an existing repo; colleagues and CI see plain git; git commands work and teach as they go. <code>rm -rf .wip/</code> exits completely.</p>
+        </li>
+        <li>
+          <h3>SQLite storage, filesystem as adapter</h3>
+          <p>Headless API mode for CI and agents. The cross-platform bug zoo is quarantined at checkout, never committed as repo truth.</p>
+        </li>
+        <li>
+          <h3>Server as optimization, never as trust root</h3>
+          <p>Fully functional offline. Any dumb remote (GitHub, S3) carries ciphertext. It never needs your plaintext, structurally.</p>
+        </li>
+      </ol>
+      <p>Full detail, key design decisions included, in the <a href="/rfc.html">RFC</a>.</p>
+    </section>
+
+    <!-- ============ AGENTS ============ -->
+    <section>
+      <h2><span class="sec-num">§3</span> why now: agents</h2>
+      <p class="big-claim">git gives your agent the keys to everything.<br />wip gives it a keycard.</p>
+      <p>Every agent tool today handles safety by asking nicely: system prompts, allowlists, "please don't read .env". wip doesn't ask. An agent invited without a scope's key holds ciphertext, not a rule it promised to follow. Every agent change is signed by a session key and carries its delegation chain. Delegation only narrows: no invitee, human or agent, ever exceeds the inviter, enforced by key wrapping, not policy.</p>
+      <p>Honesty rule, stated up front: the claim is never "the agent can't do damage". The claim is that damage is <em>bounded</em> (crypto scopes) and <em>reversible</em> (op log undo).</p>
+    </section>
+
+    <!-- ============ KILL LIST ============ -->
+    <section class="kill-section" id="kill">
+      <h2><span class="sec-num">§4</span> what can kill this</h2>
+      <p>Every pitch has a graveyard section. Most hide it. Here is ours, stated plainly, because you'll find these anyway and we'd rather you attack the hard version.</p>
+      <ol class="kill-list">
+        <li><strong>Adoption gravity.</strong> Git won on network effects; hg and bzr died anyway. The entire coexist strategy is the mitigation, and it's still risk #1.</li>
+        <li><strong>Sealed content breaks consumers.</strong> Teammates can't build code they can't read. Mitigations designed, unproven at scale.</li>
+        <li><strong>Crypto review burden.</strong> Nobody should trust an embargoed 0-day to this before professional cryptographic review. "We rolled our own" is disqualifying in this market, so the audit is on the critical path.</li>
+      </ol>
+      <p>Six more, stated just as plainly, in the <a href="/rfc.html#kill">RFC kill list</a>.</p>
+    </section>
+
+    <!-- ============ ANTAGONIST ============ -->
+    <section x-data="{ open: null }">
+      <h2><span class="sec-num">§5</span> the hostile review</h2>
+      <p>Before publishing, the design went through two rounds of adversarial review, hostile personas attacking <a href="/antagonist.md">the system</a> and then <a href="/antagonist2.md">the product</a>. The full Q&amp;A ships with the RFC. The hardest open wounds, honestly labeled:</p>
+
+      <div class="qa" :class="open === 1 && 'is-open'">
+        <button @click="open = open === 1 ? null : 1"><span class="qa-status open-q">OPEN</span> Same-hash reveal vs git interop</button>
+        <div x-show="open === 1" x-collapse>
+          <p>If the hash covers ciphertext, the coexisting git side still contains ciphertext after reveal, so <code>git blame</code>, <code>bisect</code>, and <code>grep</code> stay blind to that change on the git projection. The wip side sees plaintext; the git side sees a pointer. Whether that trade is acceptable is a core open question of this RFC.</p>
+        </div>
+      </div>
+
+      <div class="qa" :class="open === 2 && 'is-open'">
+        <button @click="open = open === 2 ? null : 2"><span class="qa-status open-q">OPEN</span> What does a non-reader's build do?</button>
+        <div x-show="open === 2" x-collapse>
+          <p>Metadata-only ("file changed, 40 lines") compiles nothing. The designed answer is scope boundaries aligned to the build graph plus granted build artifacts, and it is unproven. If this can't be made to work, the monorepo pitch shrinks to the secrets and embargo pitch.</p>
+        </div>
+      </div>
+
+      <div class="qa" :class="open === 3 && 'is-open'">
+        <button @click="open = open === 3 ? null : 3"><span class="qa-status open-q">OPEN</span> The solo-adopter wedge contradiction</button>
+        <div x-show="open === 3" x-collapse>
+          <p>Sealing needs a team; a solo dev gets jj's model, which jj already gives away. The bet is that sealed .env across your own devices plus undo plus coach is enough solo value. That bet is exactly what stage 0 measures, and if it's wrong, this dies cheap and early, by design.</p>
+        </div>
+      </div>
+
+      <div class="qa" :class="open === 4 && 'is-open'">
+        <button @click="open = open === 4 ? null : 4"><span class="qa-status answered">ANSWERED</span> "Permission checks are cryptography, not if-statements"</button>
+        <div x-show="open === 4" x-collapse>
+          <p>No wrap row means the bytes are noise to you. Not a server checking a rule: the absence of a key. This holds for extensions, transports, servers, and agents alike. Transports never need, and never get, read capability on sealed scopes.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ STATUS ============ -->
+    <section>
+      <h2><span class="sec-num">§6</span> status, honestly</h2>
+      <div class="status-grid">
+        <div class="status-col exists">
+          <h3>exists</h3>
+          <ul>
+            <li>full system design</li>
+            <li>two rounds of hostile review + answers</li>
+            <li>threat framing for the crypto layer</li>
+            <li>this page</li>
+          </ul>
+        </div>
+        <div class="status-col missing">
+          <h3>does not exist</h3>
+          <ul>
+            <li>code</li>
+            <li>a cryptographic audit</li>
+            <li>any reason to trust real secrets to it yet</li>
+          </ul>
+        </div>
+      </div>
+      <p>The plan is gated: if the design doesn't survive public review, or early users don't retain, this dies at stage 0. On purpose. What we're asking from you today is review, not adoption.</p>
+    </section>
+
+    <!-- ============ CTA ============ -->
+    <section class="cta" id="cta">
+      <h2><span class="sec-num">§7</span> poke holes</h2>
+      <p>Break the sealing scheme. Find the metadata leak we missed. Tell us the build-graph answer can't work. The best outcome of this page is someone killing the design cheaply, before the code exists.</p>
+      <div class="cta-row">
+        <a class="btn" href="/rfc.html">Read the full RFC →</a>
+        <a class="btn btn-ghost" href="https://github.com/bitbonsai/wip-scm">Argue on GitHub →</a>
+      </div>
+
+      <form class="notify" x-data="notifyForm()" @submit.prevent="submit">
+        <label for="email">or just watch: get one email when there is a binary. nothing else, ever.</label>
+        <div class="notify-row">
+          <input id="email" type="email" required placeholder="you@example.com" x-model="email" :disabled="state === 'done'" />
+          <button class="btn" type="submit" :disabled="state === 'busy' || state === 'done'" x-text="state === 'done' ? 'Sealed ✓' : state === 'busy' ? '…' : 'Notify me'"></button>
+        </div>
+        <p class="form-msg" x-show="msg" x-text="msg"></p>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <span>wip-scm.org · design RFC, July 2026</span>
+    <span>standing on <a href="https://github.com/jj-vcs/jj">jj</a>'s shoulders. Apache-2.0 when there is code.</span>
+  </footer>
+</body>
+</html>

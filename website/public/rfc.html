@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>wip RFC — version control where commit doesn't mean publish to everyone</title>
+  <meta name="description" content="The full design RFC for wip: sealed changes, path scopes, jj's model, git coexistence, and everything that can kill it." />
+  <script>document.documentElement.dataset.theme = localStorage.getItem('wip-theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');</script>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600&family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+  <script defer src="/main.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a href="/" class="logo" style="text-decoration:none">
+      <svg data-logo xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+        <g transform="translate(6.48 6.08) scale(0.46)" stroke-width="3.3">
+          <path d="M15 6a9 9 0 0 0-9 9V3"/>
+          <circle cx="18" cy="6" r="3"/>
+          <circle cx="6" cy="18" r="3"/>
+        </g>
+      </svg>
+      <span class="logo-text">wip<span class="dim">-scm</span></span>
+    </a>
+    <div class="header-actions">
+    <span class="rfc-badge">RFC · NO CODE YET</span>
+    <a class="icon-btn" href="https://github.com/bitbonsai/wip-scm" aria-label="GitHub">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+    </a>
+    <button class="theme-toggle icon-btn" id="theme-toggle" aria-label="toggle dark/light mode">
+      <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+      <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+    </button>
+    </div>
+  </header>
+  <hr class="rule-glow" />
+
+  <main>
+    <section class="hero" style="margin-top:3rem">
+      <h1>wip: the RFC</h1>
+      <p class="lede">Version control where "commit" doesn't mean "publish to everyone". This is the full system argument: the design, the decisions behind it, and everything we think can kill it. <strong>Read it hostile. The comment thread is on <a href="https://github.com/bitbonsai/wip-scm">GitHub</a>.</strong></p>
+    </section>
+
+    <section id="problem">
+      <h2><span class="sec-num">§1</span> problem</h2>
+      <p class="big-claim">git has exactly one read permission: all.</p>
+      <p>Anything committed is readable by everyone with repo access, forever. Consequences teams have normalized:</p>
+      <ul class="problem-list">
+        <li>Security fixes developed in out-of-band private forks, patch-over-email, ceremony outside the VCS.</li>
+        <li>Companies split monorepos not for size (tooling solved that) but for <strong>access control</strong>, then pay for it in dependency hell.</li>
+        <li>Secrets can't live in the repo at all, so every team bolts on a parallel universe: Vault, SOPS, sealed-secrets, .env files passed over Slack. Config and the code that consumes it are versioned in different systems with different access models, and drift between them causes real outages.</li>
+        <li>HR configs and unreleased-product code live in scattered side repos or, worse, leak into history.</li>
+      </ul>
+      <p>Separately, git's daily UX carries 20 years of accumulated fear: staging area, stash, detached HEAD, rebase-conflict lockups, force-push, lost work. Jujutsu (jj) has already proven a better model. Nobody has combined it with cryptographic read scopes.</p>
+    </section>
+
+    <section id="product">
+      <h2><span class="sec-num">§2</span> product</h2>
+      <p><strong>wip</strong>: a VCS built on a forked jj-lib (Apache-2.0, Rust), with:</p>
+      <ol class="pillars">
+        <li>
+          <h3>Sealed changes</h3>
+          <p><code>wip commit --seal sec-team</code> encrypts content, message, and paths. World sees an opaque blob in the DAG. Per-change data key, wrapped per recipient (HPKE). A salted plaintext commitment sits inside the hashed portion, so <code>wip reveal</code> = publish a 32-byte key: the change becomes world-readable with the <strong>same hash</strong>, no rewrite, no rebase, review threads intact. Coordinated vulnerability disclosure becomes a native workflow.</p>
+        </li>
+        <li>
+          <h3>Standing path scopes</h3>
+          <p>For monorepos and secrets. <code>wip scope create /payments --readers payments-team</code>. File deltas under the path auto-encrypt; the rest of the commit stays public. A metadata-only tier ("file changed, 40 lines") keeps builds, blame, and logs coherent for non-readers. Same mechanism gives secrets a legitimate home in the repo: encrypted config versioned in the same commits as the code that consumes it, readable only by the deploy scope. wip is not a runtime secrets manager (no dynamic leases, no runtime audit); it replaces the SOPS/git-crypt/.env layer and complements Vault above it. Pitch: <em>one repo for the whole company, where reads have owners too.</em></p>
+        </li>
+        <li>
+          <h3>jj's proven model</h3>
+          <p>Working copy is a commit (no staging, no stash), stable change IDs across rewrites, first-class conflicts (rebase never blocks), operation log with universal undo.</p>
+        </li>
+        <li>
+          <h3>Coach mode</h3>
+          <p>Git commands work as aliases, do the wip-native thing, and explain the difference in one line. Muscle memory converts organically. <code>wip init --coexist</code> runs inside an existing git repo; for public work, colleagues, CI, and GitHub never notice. Sealed content surfaces to plain-git colleagues as LFS-style opaque pointer files, never as editable text. Adoption unit = one developer.</p>
+        </li>
+        <li>
+          <h3>SQLite storage, filesystem as adapter</h3>
+          <p>Two databases: <code>repo.db</code> (syncable, safe to replicate anywhere) and <code>local.db</code> (never syncs: worktree state, plaintext cache). Working copy is a pluggable adapter: native FS, virtual FS (ProjFS/FUSE/FSKit), headless (API-only, for CI and AI agents), WASM/OPFS later. Db-as-truth quarantines the cross-platform bug zoo (case collisions, unicode normalization, path limits, CRLF) to the checkout adapter: lossy mappings are detected and warned, never silently committed as repo truth.</p>
+        </li>
+        <li>
+          <h3>Server as optimization, never as trust root</h3>
+          <p>Fully functional offline; any dumb remote (GitHub, S3) carries ciphertext. A server adds fetch ACLs (existence hiding), forward revocation, equivocation prevention, review UI, and lazy fetch at monorepo scale. That server/service is also the business model.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section id="decisions">
+      <h2><span class="sec-num">§3</span> key design decisions</h2>
+      <ul class="problem-list">
+        <li><strong>Identity from SSH keys, decryption from dedicated keys.</strong> SSH keys (already deployed, published at github.com/user.keys) sign a per-device X25519 decryption key. Works with ssh-agent and hardware keys; SSH key rotation doesn't destroy access.</li>
+        <li><strong>Seal taint is viral.</strong> Squash/merge/rebase output label = join of input labels. Loosening only by explicit reveal/grant. Information-flow control, not convention.</li>
+        <li><strong>Dedup sacrificed across seal scopes.</strong> Sealed chunks are addressed by ciphertext; convergent encryption across scopes would enable confirmation attacks. Storage cost accepted deliberately.</li>
+        <li><strong>Permission checks are cryptography, not if-statements.</strong> No wrap row = the bytes are noise to you.</li>
+        <li><strong>Exit is a feature, and a precondition.</strong> Published format spec, a standalone offline export/decrypt tool, and a git-flattening path must exist before anyone is asked to trust sealed history to wip. If the company dies, customers keep their bytes and their keys.</li>
+        <li><strong>Revert is the default state, not a command.</strong> Coexistence keeps the git projection valid continuously: <code>rm -rf .wip/</code> and the repo is a plain git repo, was one all along. <code>wip eject [--to git|jj]</code> handles the lossy parts explicitly: unpushed changes become branches, op log is archived, stored conflicts materialize with markers, and sealed changes leave as ciphertext bundles plus your keys. Eject never declassifies team-sealed content. Eject to jj is near-lossless.</li>
+      </ul>
+    </section>
+
+    <section id="kill">
+      <h2><span class="sec-num">§4</span> culprits — what can kill this, stated plainly</h2>
+      <ol class="kill-list">
+        <li><strong>Adoption gravity.</strong> Git won on network effects; hg and bzr died anyway. Mitigation is the entire coexist/coach strategy, but it remains the #1 risk. wip must be adoptable by one engineer, invisibly, with zero team buy-in, or it dies.</li>
+        <li><strong>Revocation is forward-only.</strong> Crypto cannot retract bytes someone already fetched. Honest framing required: revoke = stop future fetches + rotate keys. Overselling this destroys credibility with the exact security audience the product courts.</li>
+        <li><strong>Metadata leaks.</strong> A sealed blob on a public remote leaks existence, size, timing, and recipient list; for an embargoed exploit fix, existence alone tips attackers. Requires a "dark" tier (keyholder-only sync) and discipline in defaults. Easy to get subtly wrong.</li>
+        <li><strong>Sealed content breaks consumers.</strong> Teammates can't build code they can't read; nobody can merge what they can't decrypt. Mitigations (metadata-only tier, scope boundaries aligned to build graph, awaiting-keyholder rebase states) are designed but unproven at scale.</li>
+        <li><strong>Fork maintenance.</strong> jj-lib is pre-1.0 and churning. Label propagation hooks cut below the pluggable-backend boundary, so wip carries a real fork. Strategy: keep it surgical, upstream generic hooks, accept the rebase tax.</li>
+        <li><strong>Key loss = data loss.</strong> Lose every wrapped copy of a data key and the sealed history is gone, permanently. Needs org escrow/recovery keys by default, which reintroduces trust decisions the product must surface honestly rather than hide. Secrets-in-repo raises these stakes further: an unreadable sealed scope containing production config is an outage, not just lost history.</li>
+        <li><strong>Auto-snapshot vs secrecy.</strong> A tool whose pitch is confidentiality must not auto-record .env into synced history. Paranoid ignore defaults, size guards, and undo coaching are mandatory, not polish.</li>
+        <li><strong>Crypto review burden.</strong> Commitments, HPKE envelopes, key rotation, convergent-encryption pitfalls: this needs professional cryptographic review before anyone trusts an embargoed 0-day or production secret to it. Budget for audits; "we rolled our own" is disqualifying in this market.</li>
+        <li><strong>Ecosystem surface.</strong> Hooks, IDE integrations, submodules, LFS-class files: each gap bounces a real team. Git interop covers most, headless API helps tooling, but the long tail is long.</li>
+      </ol>
+    </section>
+
+    <section id="why-now">
+      <h2><span class="sec-num">§5</span> why now</h2>
+      <p>Supermodel-class coding agents change two things: the multi-year build-a-VCS effort is compressible, and agents themselves are a new VCS client. Headless mode with crypto-enforced path scopes means an AI agent physically cannot read code it isn't granted, an answer to a question every engineering org is currently asking. jj's rise proves the market will move off git's UX; nobody has yet given it a reason to move off git's trust model.</p>
+    </section>
+
+    <section id="not">
+      <h2><span class="sec-num">§6</span> what wip is not</h2>
+      <p>Not a blockchain, no tokens. Not end-to-end "zero-trust collaboration" theater: the server, when used, is honestly scoped. Not a runtime secrets manager: it versions encrypted config, it does not lease database credentials. Not a git killer by frontal assault: it lives inside git repos until it doesn't need to. And not a future paywall: the tool is free and stays free, whole, sealing included. The cryptography is never the thing you pay for.</p>
+    </section>
+
+    <section class="cta">
+      <h2><span class="sec-num">§7</span> now break it</h2>
+      <p>This design survived two rounds of hostile review before publication (<a href="/antagonist.md">round one: the system</a>, <a href="/antagonist2.md">round two: the business</a>); the hardest open questions are on the <a href="/#kill">front page</a>, labeled. The best outcome is you finding the one we missed.</p>
+      <div class="cta-row">
+        <a class="btn" href="https://github.com/bitbonsai/wip-scm">Argue on GitHub →</a>
+        <a class="btn btn-ghost" href="/#cta">Get notified at binary</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>wip-scm.org · design RFC, July 2026</span>
+    <span>standing on <a href="https://github.com/jj-vcs/jj">jj</a>'s shoulders. Apache-2.0 when there is code.</span>
+  </footer>
+</body>
+</html>
