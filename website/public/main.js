@@ -97,10 +97,12 @@ window.notifyForm = function () {
     email: "",
     state: "idle",
     msg: "",
+    ok: false,
     async submit() {
       if (!this.email) return;
       this.state = "busy";
       this.msg = "";
+      this.ok = false;
       try {
         const res = await fetch("/api/notify", {
           method: "POST",
@@ -108,11 +110,13 @@ window.notifyForm = function () {
           body: JSON.stringify({ email: this.email }),
         });
         if (!res.ok) throw new Error();
-        this.state = "done";
-        this.msg = "recorded. one email when there is a binary, then silence.";
+        this.ok = true;
+        this.msg = `Sealed. ${this.email} gets one email when there is a binary, then silence.`;
+        this.email = "";
       } catch {
+        this.msg = "Something broke. Try again?";
+      } finally {
         this.state = "idle";
-        this.msg = "something broke. try again?";
       }
     },
   };

@@ -223,10 +223,13 @@
       <form class="notify" x-data="notifyForm()" @submit.prevent="submit">
         <label for="email">or just watch: get one email when there is a binary. nothing else, ever.</label>
         <div class="notify-row">
-          <input id="email" type="email" required placeholder="you@example.com" x-model="email" :disabled="state === 'done'" />
-          <button class="btn" type="submit" :disabled="state === 'busy' || state === 'done'" x-text="state === 'done' ? 'Sealed ✓' : state === 'busy' ? '…' : 'Notify me'"></button>
+          <input id="email" type="email" required placeholder="you@example.com" x-model="email" :disabled="state === 'busy'" />
+          <button class="btn" type="submit" :disabled="state === 'busy'">
+            <span class="spinner" x-show="state === 'busy'" aria-hidden="true"></span>
+            <span x-text="state === 'busy' ? 'Sending' : 'Notify me'"></span>
+          </button>
         </div>
-        <p class="form-msg" x-show="msg" x-text="msg"></p>
+        <p class="form-msg" :class="ok && 'is-success'" x-show="msg" x-text="msg"></p>
       </form>
     </section>
   </main>

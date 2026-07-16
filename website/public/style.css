@@ -453,6 +453,21 @@ p:last-child { margin-bottom: 0; }
 .notify input::placeholder { color: var(--code-comment); }
 .notify input:focus { outline: none; border-color: var(--phos-dim); box-shadow: 0 0 10px var(--phos-glow); }
 .form-msg { margin-top: var(--rhy-half); font-family: var(--font-main); font-size: var(--fs-sm); color: var(--phos); }
+.form-msg.is-success { color: #a6e3a1; }
+html[data-theme="light"] .form-msg.is-success { color: #40a02b; }
+
+.spinner {
+  display: inline-block;
+  width: 0.9em; height: 0.9em;
+  margin-right: 0.5em;
+  vertical-align: -0.1em;
+  border: 2px solid var(--bg);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* ---------- footer ---------- */
 
