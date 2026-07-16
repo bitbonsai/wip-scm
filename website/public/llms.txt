@@ -1,0 +1,16 @@
+# wip
+
+> wip is a proposed version control system built on jj's change model with cryptographic read scopes: sealed changes, per-path access, universal undo, full git coexistence. This site is a design RFC. There is no code yet; the design is published for hostile review.
+
+Key facts: access control is key wrapping, not server policy. Sealed changes can be revealed later with the same hash. The tool is free forever; the cryptography is never a paywall. Apache-2.0 when there is code.
+
+## Docs
+
+- [Home](https://wip-scm.org/): problem, six design pillars, kill list, hostile review status
+- [The full RFC](https://wip-scm.org/rfc.html): complete system argument, design decisions, all nine kill risks
+- [Hostile review, round one: the system](https://wip-scm.org/antagonist.md)
+- [Hostile review, round two: the product](https://wip-scm.org/antagonist2.md)
+
+## Discussion
+
+- [GitHub repo and discussions](https://github.com/bitbonsai/wip-scm)
