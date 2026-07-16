@@ -1,3 +1,6 @@
 .DS_Store
 node_modules/
 data.db
+product.md
+reddit-post.md
+answers*.html
