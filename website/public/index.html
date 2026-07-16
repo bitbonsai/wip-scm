@@ -7,16 +7,15 @@
   <meta name="description" content="A design RFC for a post-git VCS with cryptographic read scopes. Sealed changes, path scopes, universal undo, lives inside your git repo. No code yet. Poke holes." />
   <meta property="og:title" content="wip — an RFC for a post-git VCS" />
   <meta property="og:description" content="Version control where commit doesn't mean publish to everyone. Design review wanted." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600&family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+  <link rel="preload" href="/fonts/JetBrainsMono-300.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/fonts/fonts.css" />
   <script>document.documentElement.dataset.theme = localStorage.getItem('wip-theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');</script>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <meta property="og:image" content="https://wip-scm.org/og.png" />
   <link rel="stylesheet" href="/style.css" />
   <script defer src="/main.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3/dist/cdn.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+  <script defer src="/vendor/alpine-collapse.min.js"></script>
+  <script defer src="/vendor/alpine.min.js"></script>
 </head>
 <body>
   <header class="site-header">
