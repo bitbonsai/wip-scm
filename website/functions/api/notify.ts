@@ -21,7 +21,6 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
   }
 
   if (!env.RESEND_API_KEY) {
-    console.log("notify: RESEND_API_KEY is not set");
     return Response.json({ ok: false, error: "server not configured" }, { status: 500 });
   }
 
@@ -34,14 +33,9 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
     method: "POST",
     headers,
     body: JSON.stringify({ email, unsubscribed: false }),
-  }).catch((e) => (console.log("notify: contact fetch threw", String(e)), null));
+  }).catch(() => null);
   // 409 = already a contact, fine
   if (!contact || (!contact.ok && contact.status !== 409)) {
-    console.log(
-      "notify: contact create failed",
-      contact?.status,
-      await contact?.text().catch(() => "")
-    );
     return Response.json({ ok: false, error: "contact create failed" }, { status: 502 });
   }
 
@@ -54,9 +48,8 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
       subject: "You're on the wip list",
       text: "Sealed. You'll get one email when there is a binary. Nothing else, ever.\n\n— wip-scm.org",
     }),
-  }).catch((e) => (console.log("notify: email fetch threw", String(e)), null));
+  }).catch(() => null);
   if (!sent?.ok) {
-    console.log("notify: email send failed", sent?.status, await sent?.text().catch(() => ""));
     return Response.json({ ok: false, error: "email send failed" }, { status: 502 });
   }
 
