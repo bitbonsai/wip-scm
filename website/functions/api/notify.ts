@@ -1,12 +1,10 @@
 // Cloudflare Pages Function — POST /api/notify
-// Stores the subscriber as a Resend Audience contact and sends the confirmation.
-// Env vars (set in CF Pages dashboard, encrypted):
-//   RESEND_API_KEY      required
-//   RESEND_AUDIENCE_ID  optional — if set, contact is added to this audience
+// Stores the subscriber as a Resend contact (global contacts model) and
+// sends the confirmation email.
+// Env var (set in CF Pages dashboard, encrypted): RESEND_API_KEY
 
 interface Env {
   RESEND_API_KEY: string;
-  RESEND_AUDIENCE_ID?: string;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -25,19 +23,14 @@ export async function onRequestPost(context: { request: Request; env: Env }) {
     "Content-Type": "application/json",
   };
 
-  if (env.RESEND_AUDIENCE_ID) {
-    const contact = await fetch(
-      `https://api.resend.com/audiences/${env.RESEND_AUDIENCE_ID}/contacts`,
-      {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ email, unsubscribed: false }),
-      }
-    ).catch(() => null);
-    // 409 = already subscribed, fine
-    if (!contact || (!contact.ok && contact.status !== 409)) {
-      return Response.json({ ok: false, error: "storage error" }, { status: 502 });
-    }
+  const contact = await fetch("https://api.resend.com/contacts", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ email, unsubscribed: false }),
+  }).catch(() => null);
+  // 409 = already a contact, fine
+  if (!contact || (!contact.ok && contact.status !== 409)) {
+    return Response.json({ ok: false, error: "storage error" }, { status: 502 });
   }
 
   const sent = await fetch("https://api.resend.com/emails", {
