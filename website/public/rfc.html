@@ -89,8 +89,36 @@
       </ol>
     </section>
 
+    <section id="keys">
+      <h2><span class="sec-num">§3</span> how the keys work, in plain words</h2>
+      <p>The whole crypto story is five moves. Three people for the walk-through: you, Alice (on your security team), and Bob (not on it).</p>
+      <ol class="pillars">
+        <li>
+          <h3>Identity</h3>
+          <p>You already have an SSH key; GitHub even publishes it at github.com/you.keys. wip uses it exactly once: to sign a fresh decryption key for each of your devices. The SSH key says who you are. The device key does the decrypting. Rotate your SSH key next year and nothing breaks, because access points at device keys, and those get re-signed by whatever SSH key replaces the old one.</p>
+        </li>
+        <li>
+          <h3>Sealing</h3>
+          <p><code>wip commit --seal sec-team</code> generates a random key for this one change, the <em>data key</em>, and encrypts the diff, the commit message, and the file paths with it. Then it encrypts a copy of that data key to every member of sec-team, one copy per device key. Those copies are called <em>wraps</em>. The sealed blob and its wraps travel through any remote, GitHub included, as ciphertext.</p>
+        </li>
+        <li>
+          <h3>Reading</h3>
+          <p>Alice's wip finds the wrap addressed to her device key, unwraps the data key, decrypts the change. Bob has no wrap, so Bob has noise. No server checked a permission table; there is no table. He just doesn't have a key.</p>
+        </li>
+        <li>
+          <h3>Granting</h3>
+          <p><code>wip grant sec-team @carol</code>: someone who can already read the scope wraps its key for Carol's devices. You can only hand out what you already hold, and that one sentence is the security model: no grant can ever exceed the granter. Works the same for a teammate, a CI job, or an agent with an 8-hour TTL. Revoking Carol stops all future wraps and rotates the key forward; it cannot take back bytes she already fetched. Culprit 2 below says that plainly, because overselling revocation is how you lose the security crowd.</p>
+        </li>
+        <li>
+          <h3>Revealing</h3>
+          <p>The embargo ends: <code>wip reveal rk3v</code> publishes the change's data key itself, 32 bytes, for anyone to use. From the start, the change's hash covered the ciphertext plus a commitment to the plaintext, so decrypting it changes nothing about its identity. Same hash, no rewrite, review threads still attached. Disclosure day is publishing one key.</p>
+        </li>
+      </ol>
+      <p>Everything else in the design is bookkeeping around these five moves.</p>
+    </section>
+
     <section id="decisions">
-      <h2><span class="sec-num">§3</span> key design decisions</h2>
+      <h2><span class="sec-num">§4</span> key design decisions</h2>
       <ul class="problem-list">
         <li><strong>Identity from SSH keys, decryption from dedicated keys.</strong> SSH keys (already deployed, published at github.com/user.keys) sign a per-device X25519 decryption key. Works with ssh-agent and hardware keys; SSH key rotation doesn't destroy access.</li>
         <li><strong>Seal taint is viral.</strong> Squash/merge/rebase output label = join of input labels. Loosening only by explicit reveal/grant. Information-flow control, not convention.</li>
@@ -102,7 +130,7 @@
     </section>
 
     <section id="kill">
-      <h2><span class="sec-num">§4</span> culprits — what can kill this, stated plainly</h2>
+      <h2><span class="sec-num">§5</span> culprits — what can kill this, stated plainly</h2>
       <ol class="kill-list">
         <li><strong>Adoption gravity.</strong> Git won on network effects; hg and bzr died anyway. Mitigation is the entire coexist/coach strategy, but it remains the #1 risk. wip must be adoptable by one engineer, invisibly, with zero team buy-in, or it dies.</li>
         <li><strong>Revocation is forward-only.</strong> Crypto cannot retract bytes someone already fetched. Honest framing required: revoke = stop future fetches + rotate keys. Overselling this destroys credibility with the exact security audience the product courts.</li>
@@ -117,17 +145,17 @@
     </section>
 
     <section id="why-now">
-      <h2><span class="sec-num">§5</span> why now</h2>
+      <h2><span class="sec-num">§6</span> why now</h2>
       <p>Supermodel-class coding agents change two things: the multi-year build-a-VCS effort is compressible, and agents themselves are a new VCS client. Headless mode with crypto-enforced path scopes means an AI agent physically cannot read code it isn't granted, an answer to a question every engineering org is currently asking. jj's rise proves the market will move off git's UX; nobody has yet given it a reason to move off git's trust model.</p>
     </section>
 
     <section id="not">
-      <h2><span class="sec-num">§6</span> what wip is not</h2>
+      <h2><span class="sec-num">§7</span> what wip is not</h2>
       <p>Not a blockchain, no tokens. Not end-to-end "zero-trust collaboration" theater: the server, when used, is honestly scoped. Not a runtime secrets manager: it versions encrypted config, it does not lease database credentials. Not a git killer by frontal assault: it lives inside git repos until it doesn't need to. And not a future paywall: the tool is free and stays free, whole, sealing included. The cryptography is never the thing you pay for.</p>
     </section>
 
     <section class="cta">
-      <h2><span class="sec-num">§7</span> now break it</h2>
+      <h2><span class="sec-num">§8</span> now break it</h2>
       <p>This design survived two rounds of hostile review before publication (<a href="/antagonist.md">round one: the system</a>, <a href="/antagonist2.md">round two: the business</a>); the hardest open questions are on the <a href="/#kill">front page</a>, labeled. The best outcome is you finding the one we missed.</p>
       <div class="cta-row">
         <a class="btn" href="https://github.com/bitbonsai/wip-scm">Argue on GitHub →</a>

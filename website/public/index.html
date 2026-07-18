@@ -97,7 +97,7 @@
         <li>Secrets can't live in the repo, so every team bolts on a parallel universe: Vault, SOPS, sealed-secrets, .env files passed over Slack. Config drifts from the code that consumes it, and the drift causes outages.</li>
         <li>On every forge, "private repo" means <em>the forge can read it</em>. Private as policy, not as structure.</li>
       </ul>
-      <p>Separately: git's daily UX carries 20 years of accumulated fear. jj already proved a better model, working copy as a commit, no staging, no stash, undo for everything. Nobody has combined that model with cryptographic read scopes. That empty quadrant is the proposal.</p>
+      <p>Separately: git's daily UX carries 20 years of accumulated fear. jj already proved a better model, working copy as a commit, no staging, no stash, undo for everything. Nobody has combined that model with cryptographic read scopes. That gap is the proposal.</p>
     </section>
 
     <!-- ============ DESIGN ============ -->
@@ -129,7 +129,7 @@
           <p>Fully functional offline. Any dumb remote (GitHub, S3) carries ciphertext. It never needs your plaintext, structurally.</p>
         </li>
       </ol>
-      <p>Full detail, key design decisions included, in the <a href="/rfc.html">RFC</a>.</p>
+      <p>Full detail in the <a href="/rfc.html">RFC</a>, including a plain-words walkthrough of how the keys actually work.</p>
     </section>
 
     <!-- ============ AGENTS ============ -->
@@ -137,7 +137,7 @@
       <h2><span class="sec-num">§3</span> why now: agents</h2>
       <p class="big-claim">git gives your agent the keys to everything.<br />wip gives it a keycard.</p>
       <p>Every agent tool today handles safety by asking nicely: system prompts, allowlists, "please don't read .env". wip doesn't ask. An agent invited without a scope's key holds ciphertext, not a rule it promised to follow. Every agent change is signed by a session key and carries its delegation chain. Delegation only narrows: no invitee, human or agent, ever exceeds the inviter, enforced by key wrapping, not policy.</p>
-      <p>Honesty rule, stated up front: the claim is never "the agent can't do damage". The claim is that damage is <em>bounded</em> (crypto scopes) and <em>reversible</em> (op log undo).</p>
+      <p>One rule we hold ourselves to: never claim the agent can't do damage. Nothing can claim that. wip bounds the damage (crypto scopes) and makes it reversible (op log undo), and that's the whole promise.</p>
     </section>
 
     <!-- ============ KILL LIST ============ -->
@@ -155,7 +155,7 @@
     <!-- ============ ANTAGONIST ============ -->
     <section x-data="{ open: null }">
       <h2><span class="sec-num">§5</span> the hostile review</h2>
-      <p>Before publishing, the design went through two rounds of adversarial review, hostile personas attacking <a href="/antagonist.md">the system</a> and then <a href="/antagonist2.md">the product</a>. The full Q&amp;A ships with the RFC. The hardest open wounds, honestly labeled:</p>
+      <p>Before publishing, the design went through two rounds of adversarial review, hostile personas attacking <a href="/antagonist.md">the system</a> and then <a href="/antagonist2.md">the product</a>. The full Q&amp;A ships with the RFC. The hardest open questions, labeled:</p>
 
       <div class="qa" :class="open === 1 && 'is-open'">
         <button @click="open = open === 1 ? null : 1"><span class="qa-status open-q">OPEN</span> Same-hash reveal vs git interop</button>
