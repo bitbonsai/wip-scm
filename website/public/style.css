@@ -279,7 +279,7 @@ p:last-child { margin-bottom: 0; }
   font-family: var(--font-main);
   font-size: var(--fs-sm);
   line-height: 1.715; /* 24px on 14px — rhythm line */
-  min-height: 15.5em;
+  min-height: 24.5em;
   white-space: pre-wrap;
   word-break: break-word;
 }

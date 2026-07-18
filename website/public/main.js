@@ -2,16 +2,20 @@
 
 // ---------- hero terminal ----------
 const SCRIPT = [
-  { t: "cmd", text: "wip commit --seal sec-team -m \"fix: CVE-2026-31337 heap overflow\"" },
+  { t: "comment", text: "# you maintain an OSS library, alone. a researcher reports a heap overflow." },
+  { t: "cmd", text: "wip commit --seal @me -m \"fix: exif parser heap overflow\"" },
   { t: "out", text: "sealed change rk3vwqpm created" },
-  { t: "seal", text: "world sees: ▓▓▓▓▓▓▓▓▓▓ ciphertext · 4.1 KB · 2 recipients" },
+  { t: "seal", text: "world sees: ▓▓▓▓▓▓▓▓▓▓ ciphertext · 4.1 KB · 1 recipient" },
   { t: "out", text: "" },
-  { t: "cmd", text: "git log --oneline -1        # a plain-git colleague" },
+  { t: "cmd", text: "git log --oneline -1        # contributors, forks, CI: plain git" },
   { t: "out", text: "8f21c04 [sealed] rk3vwqpm" },
   { t: "out", text: "" },
-  { t: "cmd", text: "wip reveal rk3vwqpm         # embargo lifts, patch day" },
+  { t: "cmd", text: "wip grant rk3vwqpm @reporter   # let the researcher verify your fix" },
+  { t: "out", text: "wrapped for @reporter · 2 recipients" },
+  { t: "out", text: "" },
+  { t: "cmd", text: "wip reveal rk3vwqpm         # patch shipped. embargo over." },
   { t: "out", text: "published 32-byte reveal key" },
-  { t: "ok", text: "change rk3vwqpm is now world-readable. same hash. no rewrite." },
+  { t: "ok", text: "rk3vwqpm is now world-readable. same hash. no rewrite." },
 ];
 
 const CHAR_MS = 24;
