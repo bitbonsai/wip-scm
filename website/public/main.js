@@ -2,8 +2,8 @@
 
 // ---------- hero terminal ----------
 const SCRIPT = [
-  { t: "comment", text: "# you maintain an OSS library, alone. a researcher reports a heap overflow." },
-  { t: "cmd", text: "wip commit --seal @me -m \"fix: exif parser heap overflow\"" },
+  { t: "comment", text: "# you maintain an OSS library, alone. a researcher reports an auth bypass." },
+  { t: "cmd", text: "wip commit --seal @me -m \"fix: auth bypass in session check\"" },
   { t: "out", text: "sealed change rk3vwqpm created" },
   { t: "seal", text: "world sees: ▓▓▓▓▓▓▓▓▓▓ ciphertext · 4.1 KB · 1 recipient" },
   { t: "out", text: "" },
