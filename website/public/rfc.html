@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>wip RFC — version control where commit doesn't mean publish to everyone</title>
+  <title>wip RFC · version control where commit doesn't mean publish to everyone</title>
   <meta name="description" content="The full design RFC for wip: sealed changes, path scopes, jj's model, git coexistence, and everything that can kill it." />
   <script>document.documentElement.dataset.theme = localStorage.getItem('wip-theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');</script>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -51,7 +51,7 @@
       <p>Anything committed is readable by everyone with repo access, forever. Consequences teams have normalized:</p>
       <ul class="problem-list">
         <li>Security fixes developed in out-of-band private forks, patch-over-email, ceremony outside the VCS.</li>
-        <li>Companies split monorepos not for size (tooling solved that) but for <strong>access control</strong>, then pay for it in dependency hell.</li>
+        <li>Companies split monorepos for <strong>access control</strong> long after tooling solved size, then pay for it in dependency hell.</li>
         <li>Secrets can't live in the repo at all, so every team bolts on a parallel universe: Vault, SOPS, sealed-secrets, .env files passed over Slack. Config and the code that consumes it are versioned in different systems with different access models, and drift between them causes real outages.</li>
         <li>HR configs and unreleased-product code live in scattered side repos or, worse, leak into history.</li>
       </ul>
@@ -76,7 +76,7 @@
         </li>
         <li>
           <h3>Coach mode</h3>
-          <p>Git commands work as aliases, do the wip-native thing, and explain the difference in one line. Muscle memory converts organically. <code>wip init --coexist</code> runs inside an existing git repo; for public work, colleagues, CI, and GitHub never notice. Sealed content surfaces to plain-git colleagues as LFS-style opaque pointer files, never as editable text. Adoption unit = one developer.</p>
+          <p>Git commands work as aliases, do the wip-native thing, and explain the difference in one line. Muscle memory converts one alias at a time. <code>wip init --coexist</code> runs inside an existing git repo; for public work, colleagues, CI, and GitHub never notice. Sealed content surfaces to plain-git colleagues as LFS-style opaque pointer files, never as editable text. Adoption unit = one developer.</p>
         </li>
         <li>
           <h3>SQLite storage, filesystem as adapter</h3>
@@ -121,7 +121,7 @@
       <h2><span class="sec-num">§4</span> key design decisions</h2>
       <ul class="problem-list">
         <li><strong>Identity from SSH keys, decryption from dedicated keys.</strong> SSH keys (already deployed, published at github.com/user.keys) sign a per-device X25519 decryption key. Works with ssh-agent and hardware keys; SSH key rotation doesn't destroy access.</li>
-        <li><strong>Seal taint is viral.</strong> Squash/merge/rebase output label = join of input labels. Loosening only by explicit reveal/grant. Information-flow control, not convention.</li>
+        <li><strong>Seal taint is viral.</strong> Squash/merge/rebase output label = join of input labels. Loosening only by explicit reveal/grant. The label rules are information-flow control, enforced by the tool rather than left to convention.</li>
         <li><strong>Dedup sacrificed across seal scopes.</strong> Sealed chunks are addressed by ciphertext; convergent encryption across scopes would enable confirmation attacks. Storage cost accepted deliberately.</li>
         <li><strong>Permission checks are cryptography, not if-statements.</strong> No wrap row = the bytes are noise to you.</li>
         <li><strong>Exit is a feature, and a precondition.</strong> Published format spec, a standalone offline export/decrypt tool, and a git-flattening path must exist before anyone is asked to trust sealed history to wip. If the company dies, customers keep their bytes and their keys.</li>
@@ -130,7 +130,7 @@
     </section>
 
     <section id="kill">
-      <h2><span class="sec-num">§5</span> culprits — what can kill this, stated plainly</h2>
+      <h2><span class="sec-num">§5</span> culprits: what can kill this, stated plainly</h2>
       <ol class="kill-list">
         <li><strong>Adoption gravity.</strong> Git won on network effects; hg and bzr died anyway. Mitigation is the entire coexist/coach strategy, but it remains the #1 risk. wip must be adoptable by one engineer, invisibly, with zero team buy-in, or it dies.</li>
         <li><strong>Revocation is forward-only.</strong> Crypto cannot retract bytes someone already fetched. Honest framing required: revoke = stop future fetches + rotate keys. Overselling this destroys credibility with the exact security audience the product courts.</li>

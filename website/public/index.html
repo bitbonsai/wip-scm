@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>wip — version control where commit doesn't mean publish to everyone</title>
+  <title>wip · version control where commit doesn't mean publish to everyone</title>
   <meta name="description" content="A design RFC for a post-git VCS with cryptographic read scopes. Sealed changes, path scopes, universal undo, lives inside your git repo. No code yet. Poke holes." />
-  <meta property="og:title" content="wip — an RFC for a post-git VCS" />
+  <meta property="og:title" content="wip · an RFC for a post-git VCS" />
   <meta property="og:description" content="Version control where commit doesn't mean publish to everyone. Design review wanted." />
   <link rel="preload" href="/fonts/JetBrainsMono-300.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="/fonts/JetBrainsMono-400.woff2" as="font" type="font/woff2" crossorigin />
@@ -72,7 +72,7 @@
       <p class="hero-microcopy"><strong>Free forever.</strong> Apache-2.0. Built on jj. Exit to plain git, anytime.</p>
 
       <div class="terminal" id="hero-terminal" aria-label="terminal demo">
-        <div class="terminal-bar"><i></i><i></i><i></i><span>wip — demo (simulated)</span></div>
+        <div class="terminal-bar"><i></i><i></i><i></i><span>wip · demo (simulated)</span></div>
         <pre id="terminal-body"><span class="cursor">_</span></pre>
       </div>
       <p class="terminal-note">Simulated output. That's the point of this page: it shouldn't stay simulated if the design survives review.</p>
@@ -93,7 +93,7 @@
       <p>Anything committed is readable by everyone with repo access, forever. Teams have normalized the consequences:</p>
       <ul class="problem-list">
         <li>Security fixes developed in out-of-band private forks, patch-over-email, ceremony outside the VCS.</li>
-        <li>Monorepos split not for size (tooling solved that) but for <strong>access control</strong>, paid for in dependency hell.</li>
+        <li>Monorepos split for <strong>access control</strong> long after tooling solved size, paid for in dependency hell.</li>
         <li>Secrets can't live in the repo, so every team bolts on a parallel universe: Vault, SOPS, sealed-secrets, .env files passed over Slack. Config drifts from the code that consumes it, and the drift causes outages.</li>
         <li>On every forge, "private repo" means <em>the forge can read it</em>. Private as policy, not as structure.</li>
       </ul>
@@ -181,7 +181,7 @@
       <div class="qa" :class="open === 4 && 'is-open'">
         <button @click="open = open === 4 ? null : 4"><span class="qa-status answered">ANSWERED</span> "Permission checks are cryptography, not if-statements"</button>
         <div x-show="open === 4" x-collapse>
-          <p>No wrap row means the bytes are noise to you. Not a server checking a rule: the absence of a key. This holds for extensions, transports, servers, and agents alike. Transports never need, and never get, read capability on sealed scopes.</p>
+          <p>No wrap row means the bytes are noise to you. No server checks a rule; the missing key is the mechanism. This holds for extensions, transports, servers, and agents alike. Transports never need, and never get, read capability on sealed scopes.</p>
         </div>
       </div>
     </section>
@@ -214,7 +214,7 @@
     <!-- ============ CTA ============ -->
     <section class="cta" id="cta">
       <h2><span class="sec-num">§7</span> poke holes</h2>
-      <p>Break the sealing scheme. Find the metadata leak we missed. Tell us the build-graph answer can't work. The best outcome of this page is someone killing the design cheaply, before the code exists.</p>
+      <p>Break the sealing scheme. Find the metadata leak we missed, or show why the build-graph answer can't work. The best outcome of this page is someone killing the design cheaply, before the code exists.</p>
       <div class="cta-row">
         <a class="btn" href="/rfc.html">Read the full RFC →</a>
         <a class="btn btn-ghost" href="https://github.com/bitbonsai/wip-scm">Argue on GitHub →</a>
