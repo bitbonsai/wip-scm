@@ -54,9 +54,11 @@ function esc(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
 }
 
-// dim trailing "# comment" in typed commands
+// dim trailing "# comment" in typed commands, highlight the binary
 function fmtCmd(s) {
-  return esc(s).replace(/(#.*)$/, '<span class="t-comment">$1</span>');
+  return esc(s)
+    .replace(/^(wip|git)/, '<span class="t-bin">$1</span>')
+    .replace(/(#.*)$/, '<span class="t-comment">$1</span>');
 }
 
 function render(lines, partial) {

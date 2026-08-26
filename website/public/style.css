@@ -290,6 +290,7 @@ p:last-child { margin-bottom: 0; }
 .terminal .t-seal, .mini-term .t-seal { color: var(--phos); background: var(--mark-bg); }
 .terminal .t-ok, .mini-term .t-ok { color: var(--phos-bright); }
 .terminal .t-comment, .mini-term .t-comment { color: var(--code-comment); }
+.terminal .t-bin, .mini-term .t-bin { color: var(--phos-bright); }
 
 .cursor { color: var(--phos); animation: cursor-blink 0.7s step-end infinite; }
 

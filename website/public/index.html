@@ -110,13 +110,13 @@
           <details class="pillar-more">
             <summary><svg class="chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>how it works + example</summary>
             <p>Each sealed change gets its own random data key. The diff, message, and paths are encrypted with it, and a copy of that key is encrypted to every reader's device key. The change's hash commits to the plaintext from day one, so publishing the data key later changes access, not identity. No rewrite, no new hash, no broken links.</p>
-            <pre class="mini-term"><span class="t-prompt">$ </span><span class="t-cmd">wip commit --seal sec-team -m "fix auth bypass in session check"</span>
+            <pre class="mini-term"><span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> commit --seal sec-team -m "fix auth bypass in session check"</span>
 <span class="t-out">change rk3v sealed · 4 readers · 8 device keys</span>
 <span class="t-seal">world sees: ▓▓▓▓▓▓▓▓▓▓ ciphertext · 4.1 KB</span>
 
-<span class="t-prompt">$ </span><span class="t-cmd">wip push                 <span class="t-comment"># GitHub stores ciphertext only</span></span>
+<span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> push                 <span class="t-comment"># GitHub stores ciphertext only</span></span>
 
-<span class="t-prompt">$ </span><span class="t-cmd">wip reveal rk3v          <span class="t-comment"># embargo ends</span></span>
+<span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> reveal rk3v          <span class="t-comment"># embargo ends</span></span>
 <span class="t-ok">published data key · rk3v world-readable · hash unchanged</span></pre>
           </details>
         </li>
@@ -126,12 +126,12 @@
           <details class="pillar-more">
             <summary><svg class="chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>how it works + example</summary>
             <p>Create a scope once. From then on, every commit touching that path encrypts those files with the scope key while the rest of the commit stays public. Non-readers see metadata ("file changed, 40 lines") so logs stay coherent. Secrets stop living in a parallel system: config sits next to the code that consumes it, versioned in the same commit, so the two can't drift apart.</p>
-            <pre class="mini-term"><span class="t-prompt">$ </span><span class="t-cmd">wip scope create /payments --readers payments-team</span>
-<span class="t-prompt">$ </span><span class="t-cmd">wip commit -m "add refund endpoint"  <span class="t-comment"># touches /payments/*</span></span>
+            <pre class="mini-term"><span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> scope create /payments --readers payments-team</span>
+<span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> commit -m "add refund endpoint"  <span class="t-comment"># touches /payments/*</span></span>
 <span class="t-out">/payments sealed to payments-team · rest public</span>
 
-<span class="t-prompt">$ </span><span class="t-cmd">wip scope create .env --readers @me</span>
-<span class="t-prompt">$ </span><span class="t-cmd">wip commit -m "rotate api key"       <span class="t-comment"># .env sealed to you</span></span>
+<span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> scope create .env --readers @me</span>
+<span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> commit -m "rotate api key"       <span class="t-comment"># .env sealed to you</span></span>
 <span class="t-seal">world sees: ▓▓▓▓▓▓▓▓▓▓ ciphertext · 1 reader</span></pre>
           </details>
         </li>
@@ -141,9 +141,9 @@
           <details class="pillar-more">
             <summary><svg class="chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>how it works + example</summary>
             <p>In git, your work sits in limbo until you commit, and half the UX exists to manage that limbo (staging, stashing, reflog archaeology). wip commits continuously, so you describe, split, and rewrite changes whenever you like. Made a mess? <code>wip undo</code> steps the whole repo back one operation. Ctrl-Z for the repository.</p>
-            <pre class="mini-term"><span class="t-prompt">$ </span><span class="t-cmd">wip describe -m "retry logic"  <span class="t-comment"># describe anytime, nothing staged</span></span>
-<span class="t-prompt">$ </span><span class="t-cmd">wip rebase -d main             <span class="t-comment"># conflicts recorded, not blocking</span></span>
-<span class="t-prompt">$ </span><span class="t-cmd">wip undo                       <span class="t-comment"># wrong target? one step back</span></span>
+            <pre class="mini-term"><span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> describe -m "retry logic"  <span class="t-comment"># describe anytime, nothing staged</span></span>
+<span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> rebase -d main             <span class="t-comment"># conflicts recorded, not blocking</span></span>
+<span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> undo                       <span class="t-comment"># wrong target? one step back</span></span>
 <span class="t-ok">restored repo to operation #42</span></pre>
           </details>
         </li>
@@ -153,7 +153,7 @@
           <details class="pillar-more">
             <summary><svg class="chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>how it works + example</summary>
             <p>wip keeps a valid git projection of the repo at all times, so nothing breaks for people who never install it. Sealed content appears on the git side as opaque pointer files, like git-lfs. Adoption starts with one developer and zero team buy-in; coach mode converts your muscle memory one alias at a time.</p>
-            <pre class="mini-term"><span class="t-prompt">$ </span><span class="t-cmd">git commit -m "retry logic"</span>
+            <pre class="mini-term"><span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">git</span> commit -m "retry logic"</span>
 <span class="t-out">wip: committed as change qpmv (working copy is always a commit)</span>
 <span class="t-out">git compat: wrote commit 4f2a9c1</span></pre>
           </details>
@@ -164,7 +164,7 @@
           <details class="pillar-more">
             <summary><svg class="chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>how it works + example</summary>
             <p>Two databases: <code>repo.db</code> holds history and syncs anywhere; <code>local.db</code> holds worktree state and plaintext cache and never leaves the machine. Because checkout is an adapter, wip can also run against a virtual filesystem (ProjFS/FUSE/FSKit) or none at all, which is how CI and agents drive it through the API without a working copy.</p>
-            <pre class="mini-term"><span class="t-prompt">$ </span><span class="t-cmd">wip status</span>
+            <pre class="mini-term"><span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> status</span>
 <span class="t-out">warning: src/Config.ts and src/config.ts differ only in case
 this filesystem (APFS, case-insensitive) cannot hold both</span>
 <span class="t-ok">checked out src/Config.ts · repo history untouched</span></pre>
@@ -176,8 +176,8 @@ this filesystem (APFS, case-insensitive) cannot hold both</span>
           <details class="pillar-more">
             <summary><svg class="chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>how it works + example</summary>
             <p>With git, "private repo" means the forge can read it. With wip, read access is key possession: a compromised remote leaks ciphertext, not code. Revoking someone stops future fetches and rotates keys forward, and the server helps enforce that, but it never had read power to lose.</p>
-            <pre class="mini-term"><span class="t-prompt">$ </span><span class="t-cmd">wip remote add origin git@github.com:acme/pay.git</span>
-<span class="t-prompt">$ </span><span class="t-cmd">wip push                       <span class="t-comment"># sealed scopes stay ciphertext</span></span>
+            <pre class="mini-term"><span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> remote add origin git@github.com:acme/pay.git</span>
+<span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> push                       <span class="t-comment"># sealed scopes stay ciphertext</span></span>
 <span class="t-seal">github.com compromised tomorrow → attackers get ▓▓▓▓▓▓ ciphertext</span></pre>
           </details>
         </li>
