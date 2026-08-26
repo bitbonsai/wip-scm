@@ -132,7 +132,7 @@ em { font-style: italic; }
   letter-spacing: 0.01em;
   color: var(--phos);
 }
-.logo-text .dim { color: var(--ink-dim); }
+.logo-text .dim, h1 .dim { color: var(--ink-dim); }
 
 .site-nav { display: flex; gap: 1.5rem; }
 .site-nav a {
