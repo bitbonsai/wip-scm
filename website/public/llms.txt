@@ -7,7 +7,7 @@ Key facts: access control is key wrapping, not server policy. Sealed changes can
 ## Docs
 
 - [Home](https://wip-scm.org/): problem, six design pillars, kill list, hostile review status
-- [The full RFC](https://wip-scm.org/rfc.html): complete system argument, design decisions, all nine kill risks
+- [The full RFC](https://wip-scm.org/rfc): complete system argument, design decisions, all nine kill risks
 - [Hostile review: the system](https://wip-scm.org/antagonist.md)
 
 ## Discussion

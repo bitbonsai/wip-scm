@@ -32,7 +32,7 @@
       <span class="logo-text">wip<span class="dim">-scm</span></span>
     </span>
     <div class="header-actions">
-    <a class="rfc-badge" href="/rfc.html">RFC · NO CODE YET</a>
+    <a class="rfc-badge" href="/rfc">RFC · NO CODE YET</a>
     <a class="icon-btn" href="https://github.com/bitbonsai/wip-scm" aria-label="GitHub">
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
     </a>
@@ -66,7 +66,7 @@
       </p>
 
       <div class="hero-cta">
-        <a class="btn" href="/rfc.html">Read the full RFC →</a>
+        <a class="btn" href="/rfc">Read the full RFC →</a>
         <a class="btn btn-ghost" href="#cta">Get notified at binary</a>
       </div>
       <p class="hero-microcopy"><strong>RFC v0.1, July 2026.</strong> Free forever. Apache-2.0. Built on jj. Exit to plain git, anytime.</p>
@@ -106,30 +106,81 @@
       <ol class="pillars">
         <li>
           <h3>Sealed changes</h3>
-          <p><code>wip commit --seal sec-team</code>: content, message, and paths encrypted, the world sees an opaque blob. <code>wip reveal</code> publishes one key and the change goes public with the same hash. Embargoes become a native workflow.</p>
+          <p><code>wip commit --seal sec-team</code> encrypts the change: contents, message, file paths. Everyone else sees an opaque blob. When the embargo ends, <code>wip reveal</code> publishes one key and the change goes public with the same hash, so review threads and links survive.</p>
+          <details class="pillar-more">
+            <summary>how it works + example</summary>
+            <p>Each sealed change gets its own random data key. The diff, message, and paths are encrypted with it, and a copy of that key is encrypted to every reader's device key. The change's hash commits to the plaintext from day one, so publishing the data key later changes access, not identity. No rewrite, no new hash, no broken links.</p>
+            <pre class="mini-term">$ wip commit --seal sec-team -m "fix auth bypass in session check"
+change rk3v sealed · 4 readers · 8 device keys
+
+$ wip push                 # GitHub stores ciphertext only
+
+# embargo ends
+$ wip reveal rk3v
+published data key · rk3v world-readable · hash unchanged</pre>
+          </details>
         </li>
         <li>
           <h3>Standing path scopes</h3>
-          <p><code>/payments</code> readable only by payments-team. Your .env versioned in the repo, readable only by you. Replaces the SOPS/git-crypt/.env layer.</p>
+          <p>Persistent access rules per path. <code>/payments</code> readable only by payments-team. Your <code>.env</code> versioned in the repo, readable only by you. Replaces the SOPS/git-crypt/.env layer.</p>
+          <details class="pillar-more">
+            <summary>how it works + example</summary>
+            <p>Create a scope once. From then on, every commit touching that path encrypts those files with the scope key while the rest of the commit stays public. Non-readers see metadata ("file changed, 40 lines") so logs stay coherent. Secrets stop living in a parallel system: config sits next to the code that consumes it, versioned in the same commit, so the two can't drift apart.</p>
+            <pre class="mini-term">$ wip scope create /payments --readers payments-team
+$ wip commit -m "add refund endpoint"     # touches /payments/*
+/payments sealed to payments-team · rest public
+
+$ wip scope create .env --readers @me
+$ wip commit -m "rotate api key"          # .env sealed to you</pre>
+          </details>
         </li>
         <li>
           <h3>jj's proven model</h3>
-          <p>Working copy is a commit. No staging, no stash. Conflicts never block. Universal undo.</p>
+          <p>The daily model comes from jj, a VCS in production use for years. Your working copy is already a commit: no staging area, no stash. Conflicts are recorded instead of blocking you. Every operation is undoable.</p>
+          <details class="pillar-more">
+            <summary>how it works + example</summary>
+            <p>In git, your work sits in limbo until you commit, and half the UX exists to manage that limbo (staging, stashing, reflog archaeology). wip commits continuously, so you describe, split, and rewrite changes whenever you like. Made a mess? <code>wip undo</code> steps the whole repo back one operation. Ctrl-Z for the repository.</p>
+            <pre class="mini-term">$ wip describe -m "retry logic"   # describe anytime, nothing staged
+$ wip rebase -d main              # conflicts recorded, not blocking
+$ wip undo                        # wrong target? one step back</pre>
+          </details>
         </li>
         <li>
           <h3>Lives inside git + coach mode</h3>
-          <p><code>wip init --coexist</code> joins an existing repo; colleagues and CI see plain git; git commands work and teach as they go. <code>rm -rf .wip/</code> exits completely.</p>
+          <p><code>wip init --coexist</code> runs inside your existing repo. Colleagues and CI keep seeing plain git. Git commands still work: each does the wip-native thing and prints a one-line explanation. <code>rm -rf .wip/</code> and you're back to a plain git repo.</p>
+          <details class="pillar-more">
+            <summary>how it works + example</summary>
+            <p>wip keeps a valid git projection of the repo at all times, so nothing breaks for people who never install it. Sealed content appears on the git side as opaque pointer files, like git-lfs. Adoption starts with one developer and zero team buy-in; coach mode converts your muscle memory one alias at a time.</p>
+            <pre class="mini-term">$ git commit -m "retry logic"
+wip: committed as change qpmv (working copy is always a commit)
+git compat: wrote commit 4f2a9c1</pre>
+          </details>
         </li>
         <li>
           <h3>SQLite storage, filesystem as adapter</h3>
-          <p>Headless API mode for CI and agents. The cross-platform bug zoo is quarantined at checkout, never committed as repo truth.</p>
+          <p>Repo truth lives in SQLite, not in files. The filesystem is only a checkout adapter, so platform quirks (case-insensitive volumes, unicode normalization, CRLF) are caught and warned about at checkout instead of silently entering history. A headless API mode serves CI and agents.</p>
+          <details class="pillar-more">
+            <summary>how it works + example</summary>
+            <p>Two databases: <code>repo.db</code> holds history and syncs anywhere; <code>local.db</code> holds worktree state and plaintext cache and never leaves the machine. Because checkout is an adapter, wip can also run against a virtual filesystem (ProjFS/FUSE/FSKit) or none at all, which is how CI and agents drive it through the API without a working copy.</p>
+            <pre class="mini-term">$ wip status
+warning: src/Config.ts and src/config.ts differ only in case
+this filesystem (APFS, case-insensitive) cannot hold both
+checked out src/Config.ts · repo history untouched</pre>
+          </details>
         </li>
         <li>
           <h3>Server as optimization, never as trust root</h3>
-          <p>Fully functional offline. Any dumb remote (GitHub, S3) carries ciphertext. It never needs your plaintext, structurally.</p>
+          <p>wip works fully offline. Any dumb remote (GitHub, S3) stores ciphertext and never holds your keys. A wip server adds conveniences (fetch ACLs, review UI, lazy fetch), and removing it costs you those conveniences, nothing else.</p>
+          <details class="pillar-more">
+            <summary>how it works + example</summary>
+            <p>With git, "private repo" means the forge can read it. With wip, read access is key possession: a compromised remote leaks ciphertext, not code. Revoking someone stops future fetches and rotates keys forward, and the server helps enforce that, but it never had read power to lose.</p>
+            <pre class="mini-term">$ wip remote add origin git@github.com:acme/pay.git
+$ wip push                      # sealed scopes stay ciphertext
+# github.com compromised tomorrow → attackers get encrypted blobs</pre>
+          </details>
         </li>
       </ol>
-      <p>Full detail in the <a href="/rfc.html">RFC</a>, including a plain-words walkthrough of how the keys actually work.</p>
+      <p>Full detail in the <a href="/rfc">RFC</a>, including a plain-words walkthrough of how the keys actually work.</p>
     </section>
 
     <!-- ============ AGENTS ============ -->
@@ -149,7 +200,7 @@
         <li><strong>Sealed content breaks consumers.</strong> Teammates can't build code they can't read. Mitigations designed, unproven at scale.</li>
         <li><strong>Crypto review burden.</strong> Nobody should trust an embargoed 0-day to this before professional cryptographic review. "We rolled our own" is disqualifying in this market, so the audit is on the critical path.</li>
       </ol>
-      <p>Six more, stated just as plainly, in the <a href="/rfc.html#kill">RFC kill list</a>.</p>
+      <p>Six more, stated just as plainly, in the <a href="/rfc#kill">RFC kill list</a>.</p>
     </section>
 
     <!-- ============ ANTAGONIST ============ -->
@@ -216,7 +267,7 @@
       <h2><span class="sec-num">§7</span> poke holes</h2>
       <p>Break the sealing scheme. Find the metadata leak we missed, or show why the build-graph answer can't work. The best outcome of this page is someone killing the design cheaply, before the code exists.</p>
       <div class="cta-row">
-        <a class="btn" href="/rfc.html">Read the full RFC →</a>
+        <a class="btn" href="/rfc">Read the full RFC →</a>
         <a class="btn btn-ghost" href="https://github.com/bitbonsai/wip-scm">Argue on GitHub →</a>
       </div>
 

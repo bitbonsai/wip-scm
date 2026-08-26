@@ -357,6 +357,36 @@ p:last-child { margin-bottom: 0; }
 .pillars p:last-child { margin-bottom: 0; }
 .pillars p strong { color: var(--ink); }
 
+.pillar-more { margin-top: var(--rhy-half); }
+.pillar-more summary {
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--font-display);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--phos-dim);
+}
+.pillar-more summary::-webkit-details-marker { display: none; }
+.pillar-more summary::before { content: "+ "; color: var(--phos); }
+.pillar-more[open] summary::before { content: "− "; }
+.pillar-more summary:hover { color: var(--phos-bright); }
+.pillar-more p { margin-top: var(--rhy-half); }
+
+.mini-term {
+  margin: var(--rhy-half) 0 0;
+  padding: 1rem;
+  border: 1px solid var(--phos-dark);
+  background: var(--bg-screen);
+  font-family: var(--font-main);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  color: var(--ink-dim);
+  white-space: pre;
+  overflow-x: auto;
+}
+
 /* ---------- kill list ---------- */
 
 .kill-list { list-style: none; counter-reset: kill; margin-top: var(--rhy); }
