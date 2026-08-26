@@ -346,6 +346,7 @@ p:last-child { margin-bottom: 0; }
   position: relative;
   border-bottom: 1px solid var(--phos-dark);
 }
+.pillars > li:last-child { border-bottom: 0; }
 .pillars > li::before {
   content: counter(pillar, decimal-leading-zero);
   position: absolute; left: 0; top: 1.6rem;
