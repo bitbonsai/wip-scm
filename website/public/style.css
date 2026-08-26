@@ -284,12 +284,12 @@ p:last-child { margin-bottom: 0; }
   word-break: break-word;
 }
 
-.terminal .t-cmd { color: var(--ink); }
-.terminal .t-prompt { color: var(--phos); }
-.terminal .t-out { color: var(--code-mid); }
-.terminal .t-seal { color: var(--phos); background: var(--mark-bg); }
-.terminal .t-ok { color: var(--phos-bright); }
-.terminal .t-comment { color: var(--code-comment); }
+.terminal .t-cmd, .mini-term .t-cmd { color: var(--ink); }
+.terminal .t-prompt, .mini-term .t-prompt { color: var(--phos); }
+.terminal .t-out, .mini-term .t-out { color: var(--code-mid); }
+.terminal .t-seal, .mini-term .t-seal { color: var(--phos); background: var(--mark-bg); }
+.terminal .t-ok, .mini-term .t-ok { color: var(--phos-bright); }
+.terminal .t-comment, .mini-term .t-comment { color: var(--code-comment); }
 
 .cursor { color: var(--phos); animation: cursor-blink 0.7s step-end infinite; }
 
@@ -359,14 +359,11 @@ p:last-child { margin-bottom: 0; }
 
 .pillar-more {
   margin-top: var(--rhy-half);
-  border: 1px solid color-mix(in srgb, var(--phos) 15%, transparent);
-  border-radius: 8px;
+  border-radius: 10px;
   background: color-mix(in srgb, var(--bg-screen) 55%, transparent);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  transition: border-color 0.2s ease;
 }
-.pillar-more[open] { border-color: var(--phos-dim); }
 .pillar-more summary {
   cursor: pointer;
   list-style: none;
@@ -394,7 +391,7 @@ p:last-child { margin-bottom: 0; }
 .mini-term {
   margin: var(--rhy-half) 0.9rem 0.9rem;
   padding: 1rem;
-  border: 1px solid var(--phos-dark);
+  border-radius: 6px;
   background: var(--bg-screen);
   font-family: var(--font-main);
   font-size: var(--fs-sm);
