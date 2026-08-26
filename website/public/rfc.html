@@ -96,6 +96,13 @@
         <li>
           <h3>Identity</h3>
           <p>You already have an SSH key; GitHub even publishes it at github.com/you.keys. wip uses it exactly once: to sign a fresh decryption key for each of your devices. The SSH key says who you are. The device key does the decrypting. Rotate your SSH key next year and nothing breaks, because access points at device keys, and those get re-signed by whatever SSH key replaces the old one.</p>
+          <p>A team like <code>payments-team</code> is a signed roster of SSH identities. Every <code>wip team add</code> is a statement signed by someone already on the roster, chaining back to whoever created it. Resolving <code>--readers payments-team</code> walks that roster, fetches each member's SSH key, and wraps one copy of the scope key per signed device key. The honest hole: key discovery leans on GitHub, so an account compromise can enroll an attacker's device key. Pinning and cross-signing are planned hardening; the kill list ranks this honestly.</p>
+          <pre class="mini-term"><span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> team create payments-team          <span class="t-comment"># you sign roster v1</span></span>
+<span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> team add payments-team @alice @bob</span>
+<span class="t-out">roster v2 signed · 3 members · 7 device keys</span>
+
+<span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> id @alice                         <span class="t-comment"># key discovery</span></span>
+<span class="t-out">ssh-ed25519 AAAA… · via github.com/alice.keys · 2 device keys</span></pre>
         </li>
         <li>
           <h3>Sealing</h3>
