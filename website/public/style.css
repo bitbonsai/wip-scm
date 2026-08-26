@@ -389,7 +389,7 @@ p:last-child { margin-bottom: 0; }
 .pillar-more > p { margin: 0; padding: 0 0.9rem; }
 
 .mini-term {
-  margin: var(--rhy-half) 0.9rem 0.9rem;
+  margin: var(--rhy-half) 0.9rem var(--rhy);
   padding: 1rem;
   border-radius: 6px;
   background: var(--bg-screen);
