@@ -357,10 +357,20 @@ p:last-child { margin-bottom: 0; }
 .pillars p:last-child { margin-bottom: 0; }
 .pillars p strong { color: var(--ink); }
 
-.pillar-more { margin-top: var(--rhy-half); }
+.pillar-more {
+  margin-top: var(--rhy-half);
+  border: 1px solid color-mix(in srgb, var(--phos) 15%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--bg-screen) 55%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: border-color 0.2s ease;
+}
+.pillar-more[open] { border-color: var(--phos-dim); }
 .pillar-more summary {
   cursor: pointer;
   list-style: none;
+  padding: 0.6rem 0.9rem;
   font-family: var(--font-display);
   font-size: var(--fs-xs);
   font-weight: 700;
@@ -379,10 +389,10 @@ p:last-child { margin-bottom: 0; }
   transition: transform 0.2s ease;
 }
 .pillar-more[open] .chev { transform: rotate(90deg); }
-.pillar-more p { margin-top: var(--rhy-half); }
+.pillar-more > p { margin: 0; padding: 0 0.9rem; }
 
 .mini-term {
-  margin: var(--rhy-half) 0 0;
+  margin: var(--rhy-half) 0.9rem 0.9rem;
   padding: 1rem;
   border: 1px solid var(--phos-dark);
   background: var(--bg-screen);
