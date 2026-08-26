@@ -394,6 +394,7 @@ p:last-child { margin-bottom: 0; }
 }
 .pillar-more[open] .chev { transform: rotate(90deg); }
 .pillar-more > p { margin: 0; padding: 0 0.9rem; }
+.pillar-more > p + p { margin-top: var(--rhy-half); }
 
 .mini-term {
   margin: 0 0.9rem;

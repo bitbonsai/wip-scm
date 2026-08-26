@@ -128,17 +128,16 @@
             <summary><svg class="chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>how it works + example</summary>
             <p>Create a scope once. From then on, every commit touching that path encrypts those files with the scope key while the rest of the commit stays public. Non-readers see metadata ("file changed, 40 lines") so logs stay coherent.</p>
             <p>Secrets stop living in a parallel system: config sits next to the code that consumes it, versioned in the same commit, so the two can't drift apart.</p>
-            <p>How does wip know payments-team's keys? A team is a signed roster of SSH identities, built one signed <code>team add</code> at a time. <code>@alice</code> resolves through the SSH key GitHub already publishes at github.com/alice.keys, which signs her device keys. wip wraps one copy of the scope key per device key.</p>
-            <pre class="mini-term"><span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> team create payments-team          <span class="t-comment"># you sign roster v1</span></span>
-<span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> team add payments-team @alice @bob</span>
-<span class="t-out">roster v2 signed · 3 members · 7 device keys</span>
+            <p>How does wip know payments-team's keys? Every grant is signed by someone who already has access, chaining back to the scope's creator. <code>wip grant payments-team @alice</code> wraps the scope key to her device keys, and <code>@alice</code> resolves through the SSH key GitHub publishes at github.com/alice.keys, which signs those device keys.</p>
+            <pre class="mini-term"><span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> grant payments-team @alice @bob  <span class="t-comment"># signed by you</span></span>
+<span class="t-out">roster: 3 readers · 7 device keys</span>
 
 <span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> id @alice                         <span class="t-comment"># where keys come from</span></span>
 <span class="t-out">ssh-ed25519 AAAA… · via github.com/alice.keys · 2 device keys</span>
 
 <span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> scope create /payments --readers payments-team</span>
 <span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> commit -m "add refund endpoint"  <span class="t-comment"># touches /payments/*</span></span>
-<span class="t-out">/payments sealed to payments-team · rest public</span>
+<span class="t-out">/payments sealed to 3 readers · rest public</span>
 
 <span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> scope create .env --readers @me</span>
 <span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> commit -m "rotate api key"       <span class="t-comment"># .env sealed to you</span></span>
@@ -150,7 +149,7 @@
           <p>The daily model comes from jj, a VCS in production use for years. Your working copy is already a commit: no staging area, no stash. Conflicts are recorded instead of blocking you. Every operation is undoable.</p>
           <details class="pillar-more">
             <summary><svg class="chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>how it works + example</summary>
-            <p>In git, your work sits in limbo until you commit, and half the UX exists to manage that limbo (staging, stashing, reflog archaeology). wip commits continuously, so you describe, split, and rewrite changes whenever you like.</p>
+            <p>In git, your work sits in limbo until you commit, and half the UX exists to manage that limbo (staging, stashing, reflog). wip commits continuously, so you describe, split, and rewrite changes whenever you like.</p>
             <p>Made a mess? <code>wip undo</code> steps the whole repo back one operation. Ctrl-Z for the repository.</p>
             <pre class="mini-term"><span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> describe -m "retry logic"  <span class="t-comment"># describe anytime, nothing staged</span></span>
 <span class="t-prompt">$ </span><span class="t-cmd"><span class="t-bin">wip</span> rebase -d main             <span class="t-comment"># conflicts recorded, not blocking</span></span>
