@@ -369,9 +369,16 @@ p:last-child { margin-bottom: 0; }
   color: var(--phos-dim);
 }
 .pillar-more summary::-webkit-details-marker { display: none; }
-.pillar-more summary::before { content: "+ "; color: var(--phos); }
-.pillar-more[open] summary::before { content: "− "; }
 .pillar-more summary:hover { color: var(--phos-bright); }
+.pillar-more .chev {
+  width: 0.875rem;
+  height: 0.875rem;
+  margin-right: 0.35rem;
+  vertical-align: -0.15em;
+  color: var(--phos);
+  transition: transform 0.2s ease;
+}
+.pillar-more[open] .chev { transform: rotate(90deg); }
 .pillar-more p { margin-top: var(--rhy-half); }
 
 .mini-term {

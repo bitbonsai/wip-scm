@@ -108,7 +108,7 @@
           <h3>Sealed changes</h3>
           <p><code>wip commit --seal sec-team</code> encrypts the change: contents, message, file paths. Everyone else sees an opaque blob. When the embargo ends, <code>wip reveal</code> publishes one key and the change goes public with the same hash, so review threads and links survive.</p>
           <details class="pillar-more">
-            <summary>how it works + example</summary>
+            <summary><svg class="chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>how it works + example</summary>
             <p>Each sealed change gets its own random data key. The diff, message, and paths are encrypted with it, and a copy of that key is encrypted to every reader's device key. The change's hash commits to the plaintext from day one, so publishing the data key later changes access, not identity. No rewrite, no new hash, no broken links.</p>
             <pre class="mini-term">$ wip commit --seal sec-team -m "fix auth bypass in session check"
 change rk3v sealed · 4 readers · 8 device keys
@@ -124,7 +124,7 @@ published data key · rk3v world-readable · hash unchanged</pre>
           <h3>Standing path scopes</h3>
           <p>Persistent access rules per path. <code>/payments</code> readable only by payments-team. Your <code>.env</code> versioned in the repo, readable only by you. Replaces the SOPS/git-crypt/.env layer.</p>
           <details class="pillar-more">
-            <summary>how it works + example</summary>
+            <summary><svg class="chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>how it works + example</summary>
             <p>Create a scope once. From then on, every commit touching that path encrypts those files with the scope key while the rest of the commit stays public. Non-readers see metadata ("file changed, 40 lines") so logs stay coherent. Secrets stop living in a parallel system: config sits next to the code that consumes it, versioned in the same commit, so the two can't drift apart.</p>
             <pre class="mini-term">$ wip scope create /payments --readers payments-team
 $ wip commit -m "add refund endpoint"     # touches /payments/*
@@ -138,7 +138,7 @@ $ wip commit -m "rotate api key"          # .env sealed to you</pre>
           <h3>jj's proven model</h3>
           <p>The daily model comes from jj, a VCS in production use for years. Your working copy is already a commit: no staging area, no stash. Conflicts are recorded instead of blocking you. Every operation is undoable.</p>
           <details class="pillar-more">
-            <summary>how it works + example</summary>
+            <summary><svg class="chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>how it works + example</summary>
             <p>In git, your work sits in limbo until you commit, and half the UX exists to manage that limbo (staging, stashing, reflog archaeology). wip commits continuously, so you describe, split, and rewrite changes whenever you like. Made a mess? <code>wip undo</code> steps the whole repo back one operation. Ctrl-Z for the repository.</p>
             <pre class="mini-term">$ wip describe -m "retry logic"   # describe anytime, nothing staged
 $ wip rebase -d main              # conflicts recorded, not blocking
@@ -149,7 +149,7 @@ $ wip undo                        # wrong target? one step back</pre>
           <h3>Lives inside git + coach mode</h3>
           <p><code>wip init --coexist</code> runs inside your existing repo. Colleagues and CI keep seeing plain git. Git commands still work: each does the wip-native thing and prints a one-line explanation. <code>rm -rf .wip/</code> and you're back to a plain git repo.</p>
           <details class="pillar-more">
-            <summary>how it works + example</summary>
+            <summary><svg class="chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>how it works + example</summary>
             <p>wip keeps a valid git projection of the repo at all times, so nothing breaks for people who never install it. Sealed content appears on the git side as opaque pointer files, like git-lfs. Adoption starts with one developer and zero team buy-in; coach mode converts your muscle memory one alias at a time.</p>
             <pre class="mini-term">$ git commit -m "retry logic"
 wip: committed as change qpmv (working copy is always a commit)
@@ -160,7 +160,7 @@ git compat: wrote commit 4f2a9c1</pre>
           <h3>SQLite storage, filesystem as adapter</h3>
           <p>Repo truth lives in SQLite, not in files. The filesystem is only a checkout adapter, so platform quirks (case-insensitive volumes, unicode normalization, CRLF) are caught and warned about at checkout instead of silently entering history. A headless API mode serves CI and agents.</p>
           <details class="pillar-more">
-            <summary>how it works + example</summary>
+            <summary><svg class="chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>how it works + example</summary>
             <p>Two databases: <code>repo.db</code> holds history and syncs anywhere; <code>local.db</code> holds worktree state and plaintext cache and never leaves the machine. Because checkout is an adapter, wip can also run against a virtual filesystem (ProjFS/FUSE/FSKit) or none at all, which is how CI and agents drive it through the API without a working copy.</p>
             <pre class="mini-term">$ wip status
 warning: src/Config.ts and src/config.ts differ only in case
@@ -172,7 +172,7 @@ checked out src/Config.ts · repo history untouched</pre>
           <h3>Server as optimization, never as trust root</h3>
           <p>wip works fully offline. Any dumb remote (GitHub, S3) stores ciphertext and never holds your keys. A wip server adds conveniences (fetch ACLs, review UI, lazy fetch), and removing it costs you those conveniences, nothing else.</p>
           <details class="pillar-more">
-            <summary>how it works + example</summary>
+            <summary><svg class="chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>how it works + example</summary>
             <p>With git, "private repo" means the forge can read it. With wip, read access is key possession: a compromised remote leaks ciphertext, not code. Revoking someone stops future fetches and rotates keys forward, and the server helps enforce that, but it never had read power to lose.</p>
             <pre class="mini-term">$ wip remote add origin git@github.com:acme/pay.git
 $ wip push                      # sealed scopes stay ciphertext
